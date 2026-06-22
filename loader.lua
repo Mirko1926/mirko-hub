@@ -66,7 +66,7 @@ if not IntroGUI.Parent then IntroGUI.Parent = LP.PlayerGui end
 -- Background
 local BG = Instance.new("Frame")
 BG.Size = UDim2.new(1, 0, 1, 0)
-BG.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
+BG.BackgroundColor3 = Color3.fromRGB(8, 8, 8)
 BG.BackgroundTransparency = 0
 BG.BorderSizePixel = 0
 BG.Parent = IntroGUI
@@ -74,9 +74,9 @@ BG.Parent = IntroGUI
 -- Gradient overlay
 local gradient = Instance.new("UIGradient")
 gradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(15, 15, 25)),
-    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(20, 20, 35)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(10, 10, 18))
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 18, 8)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(14, 13, 6)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(8, 8, 8))
 })
 gradient.Rotation = 45
 gradient.Parent = BG
@@ -87,7 +87,7 @@ LogoM.Size = UDim2.new(0, 100, 0, 100)
 LogoM.Position = UDim2.new(0.5, -50, 0.35, -50)
 LogoM.BackgroundTransparency = 1
 LogoM.Text = "M"
-LogoM.TextColor3 = Color3.fromRGB(80, 170, 255)
+LogoM.TextColor3 = Color3.fromRGB(255, 200, 30)
 LogoM.TextSize = 80
 LogoM.Font = Enum.Font.GothamBlack
 LogoM.TextTransparency = 1
@@ -99,7 +99,7 @@ LogoGlow.Size = UDim2.new(0, 200, 0, 200)
 LogoGlow.Position = UDim2.new(0.5, -100, 0.35, -100)
 LogoGlow.BackgroundTransparency = 1
 LogoGlow.Image = "rbxassetid://7669684091"
-LogoGlow.ImageColor3 = Color3.fromRGB(80, 170, 255)
+LogoGlow.ImageColor3 = Color3.fromRGB(255, 200, 30)
 LogoGlow.ImageTransparency = 1
 LogoGlow.Parent = BG
 
@@ -152,7 +152,7 @@ Instance.new("UICorner", ProgressBG).CornerRadius = UDim.new(0, 2)
 -- Progress bar fill
 local ProgressFill = Instance.new("Frame")
 ProgressFill.Size = UDim2.new(0, 0, 1, 0)
-ProgressFill.BackgroundColor3 = Color3.fromRGB(80, 170, 255)
+ProgressFill.BackgroundColor3 = Color3.fromRGB(224, 176, 16)
 ProgressFill.BorderSizePixel = 0
 ProgressFill.Parent = ProgressBG
 Instance.new("UICorner", ProgressFill).CornerRadius = UDim.new(0, 2)
@@ -163,7 +163,7 @@ for i = 1, 12 do
     local dot = Instance.new("Frame")
     dot.Size = UDim2.new(0, math.random(2, 4), 0, math.random(2, 4))
     dot.Position = UDim2.new(math.random() * 0.8 + 0.1, 0, math.random() * 0.6 + 0.2, 0)
-    dot.BackgroundColor3 = Color3.fromRGB(80, 170, 255)
+    dot.BackgroundColor3 = Color3.fromRGB(255, 200, 30)
     dot.BackgroundTransparency = 1
     dot.BorderSizePixel = 0
     dot.Parent = BG

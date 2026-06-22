@@ -13,15 +13,15 @@ local DISCORD_INVITE = "https://discord.com/invite/qfyfqMnBYK"
 
 -- Theme
 local Theme = {
-    Bg        = Color3.fromRGB(16, 16, 22),
-    Bg2       = Color3.fromRGB(24, 24, 32),
-    Bg3       = Color3.fromRGB(32, 32, 42),
-    Accent    = Color3.fromRGB(130, 90, 255),
-    Accent2   = Color3.fromRGB(90, 200, 255),
-    Text      = Color3.fromRGB(235, 235, 245),
-    SubText   = Color3.fromRGB(150, 150, 165),
-    Off       = Color3.fromRGB(55, 55, 68),
-    Danger    = Color3.fromRGB(245, 70, 90),
+    Bg        = Color3.fromRGB(8, 8, 8),
+    Bg2       = Color3.fromRGB(16, 16, 16),
+    Bg3       = Color3.fromRGB(26, 26, 26),
+    Accent    = Color3.fromRGB(224, 176, 16),   -- giallo oro scuro
+    Accent2   = Color3.fromRGB(255, 214, 51),   -- giallo chiaro
+    Text      = Color3.fromRGB(240, 240, 240),
+    SubText   = Color3.fromRGB(140, 140, 140),
+    Off       = Color3.fromRGB(45, 45, 45),
+    Danger    = Color3.fromRGB(235, 60, 60),
     Discord   = Color3.fromRGB(88, 101, 242),
 }
 
@@ -167,7 +167,7 @@ Badge.Text = "RIVALS"
 Badge.Size = UDim2.new(0, 54, 0, 18)
 Badge.Position = UDim2.new(0, 116, 0.5, -9)
 Badge.BackgroundColor3 = Theme.Accent
-Badge.TextColor3 = Color3.new(1, 1, 1)
+Badge.TextColor3 = Color3.fromRGB(10, 10, 10)
 Badge.Font = Enum.Font.GothamBold
 Badge.TextSize = 11
 Badge.Parent = TitleBar
@@ -275,7 +275,7 @@ local function selectTab(name)
         local on = (n == name)
         t.Page.Visible = on
         TweenService:Create(t.Button, TweenInfo.new(0.15), {BackgroundColor3 = on and Theme.Accent or Theme.Bg2}):Play()
-        TweenService:Create(t.Label, TweenInfo.new(0.15), {TextColor3 = on and Color3.new(1,1,1) or Theme.SubText}):Play()
+        TweenService:Create(t.Label, TweenInfo.new(0.15), {TextColor3 = on and Color3.fromRGB(10,10,10) or Theme.SubText}):Play()
         t.Indicator.Visible = on
     end
 end
@@ -293,7 +293,7 @@ local function addTab(name, icon, order)
     local indicator = Instance.new("Frame")
     indicator.Size = UDim2.new(0, 3, 0, 18)
     indicator.Position = UDim2.new(0, 0, 0.5, -9)
-    indicator.BackgroundColor3 = Color3.new(1, 1, 1)
+    indicator.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
     indicator.BorderSizePixel = 0
     indicator.Visible = false
     indicator.Parent = btn
