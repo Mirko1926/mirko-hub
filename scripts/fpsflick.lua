@@ -556,7 +556,7 @@ local function CreateSpectrumPicker(parent, default, callback)
     sv.Size = UDim2.new(1, 0, 1, -20)
     sv.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
     sv.BorderSizePixel = 0
-    sv.Parent = parent
+    sv.Parent = parent; sv.Active = true
     corner(sv, 5)
 
     local white = Instance.new("Frame")
@@ -593,7 +593,7 @@ local function CreateSpectrumPicker(parent, default, callback)
     hue.Size = UDim2.new(1, 0, 0, 12)
     hue.Position = UDim2.new(0, 0, 1, -12)
     hue.BorderSizePixel = 0
-    hue.Parent = parent
+    hue.Parent = parent; hue.Active = true
     corner(hue, 6)
     local hg = Instance.new("UIGradient", hue)
     hg.Color = ColorSequence.new({
@@ -934,21 +934,8 @@ TitleBar.InputBegan:Connect(function(input)
     end
 end)
 
--- Bottom drag handle (so the window can't get stuck if dragged off the top)
-local DragGrip = Instance.new("TextButton")
-DragGrip.AnchorPoint = Vector2.new(0.5, 1)
-DragGrip.Size = UDim2.new(0, 120, 0, 14)
-DragGrip.Position = UDim2.new(0.5, 0, 1, -1)
-DragGrip.BackgroundColor3 = Theme.Bg2
-DragGrip.BackgroundTransparency = 0.2
-DragGrip.AutoButtonColor = false
-DragGrip.Text = "• • •"
-DragGrip.TextColor3 = Theme.SubText
-DragGrip.Font = Enum.Font.GothamBold
-DragGrip.TextSize = 12
-DragGrip.Parent = Main
-corner(DragGrip, 6)
-DragGrip.InputBegan:Connect(function(input)
+-- Make the whole window draggable from any empty area (edges/sides/bottom) so it can't get stuck
+Main.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = true
         dragStart = input.Position

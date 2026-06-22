@@ -216,13 +216,13 @@ local function CreateKeybind(parent, name, getKey, setKey, order)
 end
 local function CreateSpectrumPicker(parent, default, callback)
     local hh, ss, vv = default:ToHSV()
-    local sv = Instance.new("Frame"); sv.Size = UDim2.new(1, 0, 1, -20); sv.BackgroundColor3 = Color3.fromHSV(hh,1,1); sv.BorderSizePixel = 0; sv.Parent = parent; corner(sv, 5)
+    local sv = Instance.new("Frame"); sv.Size = UDim2.new(1, 0, 1, -20); sv.BackgroundColor3 = Color3.fromHSV(hh,1,1); sv.BorderSizePixel = 0; sv.Parent = parent; sv.Active = true; corner(sv, 5)
     local white = Instance.new("Frame"); white.Size = UDim2.new(1,0,1,0); white.BackgroundColor3 = Color3.new(1,1,1); white.BorderSizePixel = 0; white.Parent = sv; corner(white, 5)
     Instance.new("UIGradient", white).Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0,0), NumberSequenceKeypoint.new(1,1)})
     local black = Instance.new("Frame"); black.Size = UDim2.new(1,0,1,0); black.BackgroundColor3 = Color3.new(0,0,0); black.BorderSizePixel = 0; black.Parent = sv; corner(black, 5)
     local bgr = Instance.new("UIGradient", black); bgr.Rotation = 90; bgr.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0,1), NumberSequenceKeypoint.new(1,0)})
     local svc = Instance.new("Frame"); svc.Size = UDim2.new(0,9,0,9); svc.AnchorPoint = Vector2.new(0.5,0.5); svc.Position = UDim2.new(ss,0,1-vv,0); svc.BackgroundColor3 = Color3.new(1,1,1); svc.BorderSizePixel = 0; svc.ZIndex = 5; svc.Parent = sv; corner(svc, 5); stroke(svc, Color3.new(0,0,0), 1, 0)
-    local hue = Instance.new("Frame"); hue.Size = UDim2.new(1,0,0,12); hue.Position = UDim2.new(0,0,1,-12); hue.BorderSizePixel = 0; hue.Parent = parent; corner(hue, 6)
+    local hue = Instance.new("Frame"); hue.Size = UDim2.new(1,0,0,12); hue.Position = UDim2.new(0,0,1,-12); hue.BorderSizePixel = 0; hue.Parent = parent; hue.Active = true; corner(hue, 6)
     Instance.new("UIGradient", hue).Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255,0,0)), ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255,255,0)),
         ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0,255,0)), ColorSequenceKeypoint.new(0.50, Color3.fromRGB(0,255,255)),
@@ -301,14 +301,8 @@ selectTab("Combat")
 local dragging, dragStart, startPos
 TitleBar.InputBegan:Connect(function(i) if (i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch) then dragging = true; dragStart = i.Position; startPos = Main.Position end end)
 
--- Bottom drag handle (so the window can't get stuck if dragged off the top)
-local DragGrip = Instance.new("TextButton")
-DragGrip.AnchorPoint = Vector2.new(0.5, 1)
-DragGrip.Size = UDim2.new(0, 120, 0, 14); DragGrip.Position = UDim2.new(0.5, 0, 1, -1)
-DragGrip.BackgroundColor3 = Theme.Bg2; DragGrip.BackgroundTransparency = 0.2; DragGrip.AutoButtonColor = false
-DragGrip.Text = "• • •"; DragGrip.TextColor3 = Theme.SubText; DragGrip.Font = Enum.Font.GothamBold; DragGrip.TextSize = 12; DragGrip.Parent = Main
-corner(DragGrip, 6)
-DragGrip.InputBegan:Connect(function(i)
+-- Make the whole window draggable from any empty area (edges/sides/bottom) so it can't get stuck
+Main.InputBegan:Connect(function(i)
     if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
         dragging = true; dragStart = i.Position; startPos = Main.Position
     end
