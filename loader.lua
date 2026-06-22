@@ -50,6 +50,10 @@ local Games = {
     [301549746] = {
         Name = "Counter Blox",
         File = "scripts/counterblox.lua"
+    },
+    [136801880565837] = {
+        Name = "FPS Flick",
+        File = "scripts/fpsflick.lua"
     }
 }
 
