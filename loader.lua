@@ -43,10 +43,13 @@ local Games = {
         Name = "One Tap",
         File = "scripts/onetap.lua"
     },
-    -- TODO: conferma il PlaceId corretto di Rivals
     [17625359962] = {
         Name = "Rivals",
         File = "scripts/rivals.lua"
+    },
+    [301549746] = {
+        Name = "Counter Blox",
+        File = "scripts/counterblox.lua"
     }
 }
 
