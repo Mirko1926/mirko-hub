@@ -1,5 +1,5 @@
 --[[
-    Mirko Hub - Arsenal
+    King Hub - Arsenal
     UI a tabs (Combat / Visuals / Movement / Misc / Player) - tema KingExploits
     by MIRKO KING YT
 ]]
@@ -190,7 +190,7 @@ local accentGrad = Instance.new("UIGradient", accentLine)
 accentGrad.Color = ColorSequence.new(Theme.Accent, Theme.Accent2)
 
 local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Text = "MIRKO HUB"
+TitleLabel.Text = "KING HUB"
 TitleLabel.Size = UDim2.new(0, 200, 1, 0)
 TitleLabel.Position = UDim2.new(0, 14, 0, 0)
 TitleLabel.BackgroundTransparency = 1
@@ -212,7 +212,7 @@ Badge.Parent = TitleBar
 corner(Badge, 5)
 
 local credit = Instance.new("TextLabel")
-credit.Text = "made by MIRKO KING YT"
+credit.Text = "by MIRKO KING YT"
 credit.Size = UDim2.new(0, 200, 1, 0)
 credit.Position = UDim2.new(0, 186, 0, 0)
 credit.BackgroundTransparency = 1
@@ -1181,7 +1181,7 @@ CreateKeybind(playerPage, "Toggle UI Key", function() return toggleKey end, func
 CreateSection(playerPage, "Danger Zone", 9)
 
 CreateButton(playerPage, "Destroy Script", 10, function()
-    notify("Mirko Hub closed.", Theme.Danger)
+    notify("King Hub closed.", Theme.Danger)
     task.wait(0.2)
     if Cleanup then Cleanup() end
 end, Theme.Danger)
@@ -1259,7 +1259,7 @@ MinBtn.MouseButton1Click:Connect(function()
     TweenService:Create(Main, TweenInfo.new(0.28, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = goal}):Play()
 end)
 CloseBtn.MouseButton1Click:Connect(function()
-    notify("Mirko Hub closed.", Theme.Danger)
+    notify("King Hub closed.", Theme.Danger)
     task.wait(0.2)
     if Cleanup then Cleanup() end
 end)

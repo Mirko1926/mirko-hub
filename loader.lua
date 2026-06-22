@@ -1,5 +1,5 @@
 --[[
-    MIRKO HUB - Main Loader
+    KING HUB - Main Loader
     Auto-detects game and loads the correct script from the GitHub repo.
 
     Usage (in executor):
@@ -119,7 +119,7 @@ local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(0, 300, 0, 40)
 Title.Position = UDim2.new(0.5, -150, 0.35, 55)
 Title.BackgroundTransparency = 1
-Title.Text = "MIRKO HUB"
+Title.Text = "KING HUB"
 Title.TextColor3 = Color3.new(1, 1, 1)
 Title.TextSize = 28
 Title.Font = Enum.Font.GothamBlack
@@ -131,7 +131,7 @@ local Subtitle = Instance.new("TextLabel")
 Subtitle.Size = UDim2.new(0, 300, 0, 25)
 Subtitle.Position = UDim2.new(0.5, -150, 0.35, 90)
 Subtitle.BackgroundTransparency = 1
-Subtitle.Text = "made by MIRKO KING YT"
+Subtitle.Text = "by MIRKO KING YT"
 Subtitle.TextColor3 = Color3.fromRGB(120, 120, 140)
 Subtitle.TextSize = 14
 Subtitle.Font = Enum.Font.GothamMedium
@@ -305,10 +305,10 @@ if gameInfo then
         if fn then
             fn()
         else
-            warn("Mirko Hub: Script error - " .. tostring(err))
+            warn("King Hub: Script error - " .. tostring(err))
         end
     else
-        warn("Mirko Hub: Could not fetch script - " .. gameInfo.File)
+        warn("King Hub: Could not fetch script - " .. gameInfo.File)
     end
 
 else

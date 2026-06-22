@@ -1,4 +1,4 @@
--- Mirko Hub Phantom Forces (ESP-only)
+-- King Hub Phantom Forces (ESP-only)
 -- PF usa un motore custom con nomi offuscati: ESP via workspace.Roots (box + distanza).
 -- No aimbot, no names/team/health (not reliably readable). by MIRKO KING YT
 -- Toggle UI: Right Ctrl
@@ -91,7 +91,7 @@ accentLine.Size = UDim2.new(1, 0, 0, 2); accentLine.Position = UDim2.new(0, 0, 1
 Instance.new("UIGradient", accentLine).Color = ColorSequence.new(Theme.Accent, Theme.Accent2)
 
 local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Text = "MIRKO HUB"; TitleLabel.Size = UDim2.new(0, 110, 1, 0); TitleLabel.Position = UDim2.new(0, 14, 0, 0)
+TitleLabel.Text = "KING HUB"; TitleLabel.Size = UDim2.new(0, 110, 1, 0); TitleLabel.Position = UDim2.new(0, 14, 0, 0)
 TitleLabel.BackgroundTransparency = 1; TitleLabel.TextColor3 = Theme.Text; TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 TitleLabel.Font = Enum.Font.GothamBlack; TitleLabel.TextSize = 15; TitleLabel.Parent = TitleBar
 
@@ -101,7 +101,7 @@ Badge.BackgroundColor3 = Theme.Accent; Badge.TextColor3 = Color3.fromRGB(10, 10,
 corner(Badge, 5)
 
 local credit = Instance.new("TextLabel")
-credit.Text = "made by MIRKO KING YT"; credit.Size = UDim2.new(0, 150, 1, 0); credit.Position = UDim2.new(0, 236, 0, 0)
+credit.Text = "by MIRKO KING YT"; credit.Size = UDim2.new(0, 150, 1, 0); credit.Position = UDim2.new(0, 236, 0, 0)
 credit.BackgroundTransparency = 1; credit.TextColor3 = Theme.SubText; credit.TextXAlignment = Enum.TextXAlignment.Left
 credit.Font = Enum.Font.GothamMedium; credit.TextSize = 10; credit.Parent = TitleBar
 
@@ -291,7 +291,7 @@ CreateButton(infoPage, "Sub to YouTube", 5, subYouTube, Theme.YouTube)
 CreateSection(infoPage, "UI Settings", 6)
 CreateKeybind(infoPage, "Toggle UI Key", function() return toggleKey end, function(k) toggleKey = k end, 7)
 CreateSection(infoPage, "Danger Zone", 8)
-CreateButton(infoPage, "Destroy Script", 9, function() notify("Mirko Hub closed.", Theme.Danger); task.wait(0.2); if Cleanup then Cleanup() end end, Theme.Danger)
+CreateButton(infoPage, "Destroy Script", 9, function() notify("King Hub closed.", Theme.Danger); task.wait(0.2); if Cleanup then Cleanup() end end, Theme.Danger)
 
 selectTab("Combat")
 
@@ -312,7 +312,7 @@ MinBtn.MouseButton1Click:Connect(function()
     isOpen = not isOpen
     TweenService:Create(Main, TweenInfo.new(0.28, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = isOpen and UDim2.new(0,460,0,300) or UDim2.new(0,460,0,42)}):Play()
 end)
-CloseBtn.MouseButton1Click:Connect(function() notify("Mirko Hub closed.", Theme.Danger); task.wait(0.2); if Cleanup then Cleanup() end end)
+CloseBtn.MouseButton1Click:Connect(function() notify("King Hub closed.", Theme.Danger); task.wait(0.2); if Cleanup then Cleanup() end end)
 Main.Size = UDim2.new(0, 460, 0, 0)
 TweenService:Create(Main, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 460, 0, 300)}):Play()
 

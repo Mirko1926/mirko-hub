@@ -1,5 +1,5 @@
 -- ============================================
--- MIRKO HUB - Universal FPS
+-- KING HUB - Universal FPS
 -- Rayfield GUI | ESP, Aimbot, Bhop, Noclip, Speed, Wallbang, InfJump, Fullbright
 -- ============================================
 
@@ -222,9 +222,9 @@ connections.removing = Players.PlayerRemoving:Connect(function(p) removeESP(p) e
 
 -- ═══ RAYFIELD GUI ═══
 local Window = Rayfield:CreateWindow({
-    Name = "mirko hub",
-    LoadingTitle = "mirko hub",
-    LoadingSubtitle = "loading...",
+    Name = "KING HUB",
+    LoadingTitle = "KING HUB",
+    LoadingSubtitle = "by MIRKO KING YT",
     Theme = "Default",
     ConfigurationSaving = { Enabled = false },
     Discord = { Enabled = false },
