@@ -80,6 +80,7 @@ local S = {
 
 local Conn = _G.MirkoHub.Connections
 local Cleanup -- forward declaration
+local toggleKey = Enum.KeyCode.RightControl
 
 -----------------------------------------------------------
 -- ScreenGui
@@ -282,7 +283,9 @@ local function makePage()
     return page
 end
 
+local activeTab = nil
 local function selectTab(name)
+    activeTab = name
     for n, t in pairs(Tabs) do
         local on = (n == name)
         t.Page.Visible = on
@@ -572,6 +575,226 @@ local function CreateInfo(parent, title, value, order)
     return v
 end
 
+-- Spectrum color picker (SV square + hue bar). Fills `parent`.
+local function CreateSpectrumPicker(parent, default, callback)
+    local h, s, v = default:ToHSV()
+
+    local sv = Instance.new("Frame")
+    sv.Size = UDim2.new(1, 0, 1, -20)
+    sv.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
+    sv.BorderSizePixel = 0
+    sv.Parent = parent
+    corner(sv, 5)
+
+    local white = Instance.new("Frame")
+    white.Size = UDim2.new(1, 0, 1, 0)
+    white.BackgroundColor3 = Color3.new(1, 1, 1)
+    white.BorderSizePixel = 0
+    white.Parent = sv
+    corner(white, 5)
+    local wg = Instance.new("UIGradient", white)
+    wg.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(1, 1) })
+
+    local black = Instance.new("Frame")
+    black.Size = UDim2.new(1, 0, 1, 0)
+    black.BackgroundColor3 = Color3.new(0, 0, 0)
+    black.BorderSizePixel = 0
+    black.Parent = sv
+    corner(black, 5)
+    local bg = Instance.new("UIGradient", black)
+    bg.Rotation = 90
+    bg.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(1, 0) })
+
+    local svCur = Instance.new("Frame")
+    svCur.Size = UDim2.new(0, 9, 0, 9)
+    svCur.AnchorPoint = Vector2.new(0.5, 0.5)
+    svCur.Position = UDim2.new(s, 0, 1 - v, 0)
+    svCur.BackgroundColor3 = Color3.new(1, 1, 1)
+    svCur.BorderSizePixel = 0
+    svCur.ZIndex = 5
+    svCur.Parent = sv
+    corner(svCur, 5)
+    stroke(svCur, Color3.new(0, 0, 0), 1, 0)
+
+    local hue = Instance.new("Frame")
+    hue.Size = UDim2.new(1, 0, 0, 12)
+    hue.Position = UDim2.new(0, 0, 1, -12)
+    hue.BorderSizePixel = 0
+    hue.Parent = parent
+    corner(hue, 6)
+    local hg = Instance.new("UIGradient", hue)
+    hg.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 0)),
+        ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
+        ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+        ColorSequenceKeypoint.new(0.50, Color3.fromRGB(0, 255, 255)),
+        ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+        ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
+        ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 0)),
+    })
+    local hueCur = Instance.new("Frame")
+    hueCur.Size = UDim2.new(0, 4, 1, 2)
+    hueCur.AnchorPoint = Vector2.new(0.5, 0.5)
+    hueCur.Position = UDim2.new(h, 0, 0.5, 0)
+    hueCur.BackgroundColor3 = Color3.new(1, 1, 1)
+    hueCur.BorderSizePixel = 0
+    hueCur.ZIndex = 5
+    hueCur.Parent = hue
+    corner(hueCur, 2)
+    stroke(hueCur, Color3.new(0, 0, 0), 1, 0)
+
+    local function fire() callback(Color3.fromHSV(h, s, v)) end
+
+    local dragSV, dragHue = false, false
+    sv.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then dragSV = true end end)
+    hue.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then dragHue = true end end)
+    Conn[#Conn+1] = UIS.InputEnded:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 then dragSV = false; dragHue = false end
+    end)
+    Conn[#Conn+1] = UIS.InputChanged:Connect(function(i)
+        if i.UserInputType ~= Enum.UserInputType.MouseMovement then return end
+        if dragSV then
+            local rx = math.clamp((i.Position.X - sv.AbsolutePosition.X) / sv.AbsoluteSize.X, 0, 1)
+            local ry = math.clamp((i.Position.Y - sv.AbsolutePosition.Y) / sv.AbsoluteSize.Y, 0, 1)
+            s, v = rx, 1 - ry
+            svCur.Position = UDim2.new(rx, 0, ry, 0)
+            fire()
+        elseif dragHue then
+            local rx = math.clamp((i.Position.X - hue.AbsolutePosition.X) / hue.AbsoluteSize.X, 0, 1)
+            h = rx
+            hueCur.Position = UDim2.new(rx, 0, 0.5, 0)
+            sv.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
+            fire()
+        end
+    end)
+end
+
+-- Live ESP preview. Fills `parent`, reads S. Returns update() to refresh.
+local function CreateESPPreview(parent)
+    local pv = Instance.new("Frame")
+    pv.Size = UDim2.new(1, 0, 1, 0)
+    pv.BackgroundColor3 = Theme.Bg3
+    pv.BorderSizePixel = 0
+    pv.ClipsDescendants = true
+    pv.Parent = parent
+    corner(pv, 6)
+
+    local avatar = Instance.new("ImageLabel")
+    avatar.AnchorPoint = Vector2.new(0.5, 0.5)
+    avatar.Size = UDim2.new(0, 90, 0, 90)
+    avatar.Position = UDim2.new(0.5, 6, 0.5, 0)
+    avatar.BackgroundTransparency = 1
+    avatar.Parent = pv
+    task.spawn(function()
+        local ok, content = pcall(function()
+            return Players:GetUserThumbnailAsync(LP.UserId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size150x150)
+        end)
+        if ok and content then avatar.Image = content end
+    end)
+
+    local tracer = Instance.new("Frame")
+    tracer.AnchorPoint = Vector2.new(0.5, 1)
+    tracer.Size = UDim2.new(0, 2, 0, 40)
+    tracer.Position = UDim2.new(0.5, 6, 1, 0)
+    tracer.BorderSizePixel = 0
+    tracer.Parent = pv
+
+    local boxF = Instance.new("Frame")
+    boxF.AnchorPoint = Vector2.new(0.5, 0.5)
+    boxF.Size = UDim2.new(0, 64, 0, 96)
+    boxF.Position = UDim2.new(0.5, 6, 0.5, 0)
+    boxF.BackgroundTransparency = 1
+    boxF.Parent = pv
+    local boxStroke = stroke(boxF, S.ESPColor, 1.5, 0)
+
+    local nameL = Instance.new("TextLabel")
+    nameL.AnchorPoint = Vector2.new(0.5, 1)
+    nameL.Size = UDim2.new(1, 0, 0, 14)
+    nameL.Position = UDim2.new(0.5, 6, 0.5, -52)
+    nameL.BackgroundTransparency = 1
+    nameL.Text = LP.DisplayName
+    nameL.TextColor3 = Color3.new(1, 1, 1)
+    nameL.Font = Enum.Font.GothamBold
+    nameL.TextSize = 11
+    nameL.TextStrokeTransparency = 0.4
+    nameL.Parent = pv
+
+    local hpBg = Instance.new("Frame")
+    hpBg.AnchorPoint = Vector2.new(0.5, 0.5)
+    hpBg.Size = UDim2.new(0, 3, 0, 96)
+    hpBg.Position = UDim2.new(0.5, -30, 0.5, 0)
+    hpBg.BackgroundColor3 = Color3.new(0, 0, 0)
+    hpBg.BorderSizePixel = 0
+    hpBg.Parent = pv
+    local hpBar = Instance.new("Frame")
+    hpBar.AnchorPoint = Vector2.new(0.5, 1)
+    hpBar.Size = UDim2.new(1, 0, 0.7, 0)
+    hpBar.Position = UDim2.new(0.5, 0, 1, 0)
+    hpBar.BackgroundColor3 = Color3.fromRGB(80, 230, 80)
+    hpBar.BorderSizePixel = 0
+    hpBar.Parent = hpBg
+
+    local function update()
+        local on = S.ESP
+        boxF.Visible = on and S.ESPBoxes
+        boxStroke.Color = S.ESPColor
+        nameL.Visible = on and S.ESPNames
+        hpBg.Visible = on and S.ESPHealth
+        tracer.Visible = on and S.ESPTracers
+        tracer.BackgroundColor3 = S.ESPColor
+        avatar.ImageTransparency = on and 0 or 0.6
+    end
+    update()
+    return update
+end
+
+local function CreateKeybind(parent, name, getKey, setKey, order)
+    local holder = Instance.new("Frame")
+    holder.Size = UDim2.new(1, 0, 0, 32)
+    holder.BackgroundColor3 = Theme.Bg2
+    holder.BorderSizePixel = 0
+    holder.LayoutOrder = order
+    holder.Parent = parent
+    corner(holder, 7)
+
+    local label = Instance.new("TextLabel")
+    label.Text = name
+    label.Size = UDim2.new(0.5, -12, 1, 0)
+    label.Position = UDim2.new(0, 12, 0, 0)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Theme.Text
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Font = Enum.Font.Gotham
+    label.TextSize = 13
+    label.Parent = holder
+
+    local btn = Instance.new("TextButton")
+    btn.Text = getKey().Name
+    btn.Size = UDim2.new(0.5, -12, 0, 22)
+    btn.Position = UDim2.new(0.5, 0, 0.5, -11)
+    btn.BackgroundColor3 = Theme.Bg3
+    btn.TextColor3 = Theme.Accent
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 12
+    btn.Parent = holder
+    corner(btn, 5)
+
+    local listening = false
+    btn.MouseButton1Click:Connect(function()
+        listening = true
+        btn.Text = "Press a key..."
+    end)
+    Conn[#Conn+1] = UIS.InputBegan:Connect(function(input, gpe)
+        if not listening or gpe then return end
+        if input.UserInputType == Enum.UserInputType.Keyboard then
+            listening = false
+            setKey(input.KeyCode)
+            btn.Text = input.KeyCode.Name
+        end
+    end)
+    return holder
+end
+
 -----------------------------------------------------------
 -- UTILITIES (backend)
 -----------------------------------------------------------
@@ -855,13 +1078,27 @@ CreateToggle(combatPage, "Teleport Kill", S.TpKill, 10, function(v) S.TpKill = v
 CreateSlider(combatPage, "TP Kill Delay (x0.1s)", 1, 20, 5, 11, function(v) S.TpKillDelay = v / 10 end)
 
 -- VISUALS
+local updatePreview
+local function refresh() if updatePreview then updatePreview() end end
+
 CreateSection(visualsPage, "ESP", 1)
-CreateToggle(visualsPage, "Enable ESP", S.ESP, 2, function(v) S.ESP = v end)
-CreateToggle(visualsPage, "Boxes", S.ESPBoxes, 3, function(v) S.ESPBoxes = v end)
-CreateToggle(visualsPage, "Names", S.ESPNames, 4, function(v) S.ESPNames = v end)
-CreateToggle(visualsPage, "Health Bars", S.ESPHealth, 5, function(v) S.ESPHealth = v end)
-CreateToggle(visualsPage, "Tracers", S.ESPTracers, 6, function(v) S.ESPTracers = v end)
+CreateToggle(visualsPage, "Enable ESP", S.ESP, 2, function(v) S.ESP = v; refresh() end)
+CreateToggle(visualsPage, "Boxes", S.ESPBoxes, 3, function(v) S.ESPBoxes = v; refresh() end)
+CreateToggle(visualsPage, "Names", S.ESPNames, 4, function(v) S.ESPNames = v; refresh() end)
+CreateToggle(visualsPage, "Health Bars", S.ESPHealth, 5, function(v) S.ESPHealth = v; refresh() end)
+CreateToggle(visualsPage, "Tracers", S.ESPTracers, 6, function(v) S.ESPTracers = v; refresh() end)
 CreateToggle(visualsPage, "Team Check", S.ESPTeamCheck, 7, function(v) S.ESPTeamCheck = v end)
+
+CreateSection(visualsPage, "ESP Color", 8)
+local colorBox = Instance.new("Frame")
+colorBox.Size = UDim2.new(1, 0, 0, 130)
+colorBox.BackgroundColor3 = Theme.Bg2
+colorBox.BorderSizePixel = 0
+colorBox.LayoutOrder = 9
+colorBox.Parent = visualsPage
+corner(colorBox, 7)
+pad(colorBox, 8)
+CreateSpectrumPicker(colorBox, S.ESPColor, function(c) S.ESPColor = c; refresh() end)
 
 -- MOVEMENT
 CreateSection(movePage, "Fly", 1)
@@ -938,25 +1175,60 @@ CreateSection(playerPage, "Community", 4)
 CreateButton(playerPage, "Join Discord", 5, joinDiscord, Theme.Discord)
 CreateButton(playerPage, "Sub to YouTube", 6, subYouTube, Theme.YouTube)
 
-CreateSection(playerPage, "Danger Zone", 7)
-local toggleInfo = Instance.new("TextLabel")
-toggleInfo.Text = "Right Ctrl to toggle the UI"
-toggleInfo.Size = UDim2.new(1, 0, 0, 18)
-toggleInfo.BackgroundTransparency = 1
-toggleInfo.TextColor3 = Theme.SubText
-toggleInfo.TextXAlignment = Enum.TextXAlignment.Left
-toggleInfo.Font = Enum.Font.Gotham
-toggleInfo.TextSize = 11
-toggleInfo.LayoutOrder = 8
-toggleInfo.Parent = playerPage
+CreateSection(playerPage, "UI Settings", 7)
+CreateKeybind(playerPage, "Toggle UI Key", function() return toggleKey end, function(k) toggleKey = k end, 8)
 
-CreateButton(playerPage, "Destroy Script", 9, function()
+CreateSection(playerPage, "Danger Zone", 9)
+
+CreateButton(playerPage, "Destroy Script", 10, function()
     notify("Mirko Hub closed.", Theme.Danger)
     task.wait(0.2)
     if Cleanup then Cleanup() end
 end, Theme.Danger)
 
 selectTab("Combat")
+
+-----------------------------------------------------------
+-- ESP Preview panel (separate, to the right of the window)
+-----------------------------------------------------------
+local PreviewPanel = Instance.new("Frame")
+PreviewPanel.Name = "ESPPreview"
+PreviewPanel.AnchorPoint = Vector2.new(0, 0.5)
+PreviewPanel.Size = UDim2.new(0, 150, 0, 200)
+PreviewPanel.BackgroundColor3 = Theme.Bg
+PreviewPanel.BorderSizePixel = 0
+PreviewPanel.Parent = ScreenGui
+corner(PreviewPanel, 6)
+stroke(PreviewPanel, Theme.Accent, 1.5, 0.4)
+pad(PreviewPanel, 8)
+
+local pvTitle = Instance.new("TextLabel")
+pvTitle.Size = UDim2.new(1, 0, 0, 16)
+pvTitle.BackgroundTransparency = 1
+pvTitle.Text = "ESP PREVIEW"
+pvTitle.TextColor3 = Theme.Accent
+pvTitle.TextXAlignment = Enum.TextXAlignment.Left
+pvTitle.Font = Enum.Font.GothamBold
+pvTitle.TextSize = 11
+pvTitle.Parent = PreviewPanel
+
+local pvContent = Instance.new("Frame")
+pvContent.Size = UDim2.new(1, 0, 1, -22)
+pvContent.Position = UDim2.new(0, 0, 0, 22)
+pvContent.BackgroundColor3 = Theme.Bg2
+pvContent.BorderSizePixel = 0
+pvContent.Parent = PreviewPanel
+corner(pvContent, 6)
+
+updatePreview = CreateESPPreview(pvContent)
+
+Conn[#Conn+1] = RunService.RenderStepped:Connect(function()
+    PreviewPanel.Visible = (activeTab == "Visuals")
+    PreviewPanel.Position = UDim2.new(
+        Main.Position.X.Scale, Main.Position.X.Offset + Main.AbsoluteSize.X / 2 + 12,
+        Main.Position.Y.Scale, Main.Position.Y.Offset
+    )
+end)
 
 -----------------------------------------------------------
 -- Drag
@@ -999,7 +1271,7 @@ TweenService:Create(Main, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingD
 -- Toggle visibility with RightControl
 Conn[#Conn+1] = UIS.InputBegan:Connect(function(i, gpe)
     if gpe then return end
-    if i.KeyCode == Enum.KeyCode.RightControl then
+    if i.KeyCode == toggleKey then
         ScreenGui.Enabled = not ScreenGui.Enabled
     end
 end)
