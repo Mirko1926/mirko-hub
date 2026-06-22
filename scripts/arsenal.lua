@@ -473,10 +473,10 @@ local function CreateSlider(parent, name, min, max, default, order, callback)
     end
     sliderBtn.MouseButton1Down:Connect(function(x) sliding = true; update(x) end)
     UIS.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then sliding = false end
+        if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then sliding = false end
     end)
     UIS.InputChanged:Connect(function(input)
-        if sliding and input.UserInputType == Enum.UserInputType.MouseMovement then
+        if sliding and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             update(input.Position.X)
         end
     end)
@@ -646,13 +646,13 @@ local function CreateSpectrumPicker(parent, default, callback)
     local function fire() callback(Color3.fromHSV(h, s, v)) end
 
     local dragSV, dragHue = false, false
-    sv.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then dragSV = true end end)
-    hue.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then dragHue = true end end)
+    sv.InputBegan:Connect(function(i) if (i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch) then dragSV = true end end)
+    hue.InputBegan:Connect(function(i) if (i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch) then dragHue = true end end)
     Conn[#Conn+1] = UIS.InputEnded:Connect(function(i)
-        if i.UserInputType == Enum.UserInputType.MouseButton1 then dragSV = false; dragHue = false end
+        if (i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch) then dragSV = false; dragHue = false end
     end)
     Conn[#Conn+1] = UIS.InputChanged:Connect(function(i)
-        if i.UserInputType ~= Enum.UserInputType.MouseMovement then return end
+        if i.UserInputType ~= Enum.UserInputType.MouseMovement and i.UserInputType ~= Enum.UserInputType.Touch then return end
         if dragSV then
             local rx = math.clamp((i.Position.X - sv.AbsolutePosition.X) / sv.AbsoluteSize.X, 0, 1)
             local ry = math.clamp((i.Position.Y - sv.AbsolutePosition.Y) / sv.AbsoluteSize.Y, 0, 1)
@@ -1235,20 +1235,20 @@ end)
 -----------------------------------------------------------
 local dragging, dragStart, startPos
 TitleBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+    if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
         dragging = true
         dragStart = input.Position
         startPos = Main.Position
     end
 end)
 UIS.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
         local delta = input.Position - dragStart
         Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
 end)
 UIS.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+    if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then dragging = false end
 end)
 
 -- Minimize / Close
@@ -1279,6 +1279,30 @@ end)
 -----------------------------------------------------------
 -- Cleanup
 -----------------------------------------------------------
+-----------------------------------------------------------
+-- Mobile support (auto-detected): floating toggle + AIM button
+-----------------------------------------------------------
+if UIS.TouchEnabled and not UIS.MouseEnabled and not UIS.KeyboardEnabled then
+    local mToggle = Instance.new("TextButton")
+    mToggle.Size = UDim2.new(0, 46, 0, 46); mToggle.Position = UDim2.new(0, 14, 0, 150)
+    mToggle.BackgroundColor3 = Theme.Accent; mToggle.TextColor3 = Color3.fromRGB(10, 10, 10)
+    mToggle.Text = "KH"; mToggle.Font = Enum.Font.GothamBlack; mToggle.TextSize = 15; mToggle.Parent = ScreenGui
+    corner(mToggle, 23)
+    mToggle.MouseButton1Click:Connect(function() Main.Visible = not Main.Visible end)
+
+    local mAim = Instance.new("TextButton")
+    mAim.AnchorPoint = Vector2.new(1, 1); mAim.Size = UDim2.new(0, 78, 0, 78); mAim.Position = UDim2.new(1, -28, 1, -150)
+    mAim.BackgroundColor3 = Theme.Accent; mAim.BackgroundTransparency = 0.4; mAim.TextColor3 = Color3.fromRGB(10, 10, 10)
+    mAim.Text = "AIM"; mAim.Font = Enum.Font.GothamBold; mAim.TextSize = 18; mAim.Parent = ScreenGui
+    corner(mAim, 39)
+    mAim.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then aimHold = true end
+    end)
+    mAim.InputEnded:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then aimHold = false end
+    end)
+end
+
 Cleanup = function()
     for _, c in pairs(Conn) do pcall(function() c:Disconnect() end) end
     for _, p in pairs(Players:GetPlayers()) do removeESP(p) end
