@@ -40,6 +40,7 @@ local Config = {
     AimbotTarget = "Head", -- Head / HitboxHead / HumanoidRootPart
     ShowFOV = true,
     TeamCheck = false,
+    ESPTeamCheck = false,
     MaxDistance = 1000,
     ESPColor = Color3.fromRGB(224, 176, 16),
 }
@@ -799,13 +800,14 @@ CreateToggle(visualsPage, "Boxes", Config.ESPBoxes, 3, function(v) Config.ESPBox
 CreateToggle(visualsPage, "Names", Config.ESPNames, 4, function(v) Config.ESPNames = v; refresh() end)
 CreateToggle(visualsPage, "Health Bar", Config.ESPHealth, 5, function(v) Config.ESPHealth = v; refresh() end)
 CreateToggle(visualsPage, "Distance", Config.ESPDistance, 6, function(v) Config.ESPDistance = v; refresh() end)
+CreateToggle(visualsPage, "Team Check", Config.ESPTeamCheck, 7, function(v) Config.ESPTeamCheck = v end)
 
-CreateSection(visualsPage, "ESP Color", 7)
+CreateSection(visualsPage, "ESP Color", 8)
 local colorBox = Instance.new("Frame")
 colorBox.Size = UDim2.new(1, 0, 0, 130)
 colorBox.BackgroundColor3 = Theme.Bg2
 colorBox.BorderSizePixel = 0
-colorBox.LayoutOrder = 8
+colorBox.LayoutOrder = 9
 colorBox.Parent = visualsPage
 corner(colorBox, 7)
 pad(colorBox, 8)
@@ -1074,7 +1076,7 @@ local function UpdateESP()
             continue
         end
 
-        if Config.TeamCheck and player.Team == LocalPlayer.Team then
+        if Config.ESPTeamCheck and player.Team == LocalPlayer.Team then
             if ESPObjects[player] then HideESP(ESPObjects[player]) end
             continue
         end
