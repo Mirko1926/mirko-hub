@@ -933,6 +933,28 @@ TitleBar.InputBegan:Connect(function(input)
         startPos = Main.Position
     end
 end)
+
+-- Bottom drag handle (so the window can't get stuck if dragged off the top)
+local DragGrip = Instance.new("TextButton")
+DragGrip.AnchorPoint = Vector2.new(0.5, 1)
+DragGrip.Size = UDim2.new(0, 120, 0, 14)
+DragGrip.Position = UDim2.new(0.5, 0, 1, -1)
+DragGrip.BackgroundColor3 = Theme.Bg2
+DragGrip.BackgroundTransparency = 0.2
+DragGrip.AutoButtonColor = false
+DragGrip.Text = "• • •"
+DragGrip.TextColor3 = Theme.SubText
+DragGrip.Font = Enum.Font.GothamBold
+DragGrip.TextSize = 12
+DragGrip.Parent = Main
+corner(DragGrip, 6)
+DragGrip.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = Main.Position
+    end
+end)
 UserInputService.InputChanged:Connect(function(input)
     if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
         local delta = input.Position - dragStart

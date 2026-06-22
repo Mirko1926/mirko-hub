@@ -300,6 +300,19 @@ selectTab("Combat")
 -----------------------------------------------------------
 local dragging, dragStart, startPos
 TitleBar.InputBegan:Connect(function(i) if (i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch) then dragging = true; dragStart = i.Position; startPos = Main.Position end end)
+
+-- Bottom drag handle (so the window can't get stuck if dragged off the top)
+local DragGrip = Instance.new("TextButton")
+DragGrip.AnchorPoint = Vector2.new(0.5, 1)
+DragGrip.Size = UDim2.new(0, 120, 0, 14); DragGrip.Position = UDim2.new(0.5, 0, 1, -1)
+DragGrip.BackgroundColor3 = Theme.Bg2; DragGrip.BackgroundTransparency = 0.2; DragGrip.AutoButtonColor = false
+DragGrip.Text = "• • •"; DragGrip.TextColor3 = Theme.SubText; DragGrip.Font = Enum.Font.GothamBold; DragGrip.TextSize = 12; DragGrip.Parent = Main
+corner(DragGrip, 6)
+DragGrip.InputBegan:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+        dragging = true; dragStart = i.Position; startPos = Main.Position
+    end
+end)
 Connections[#Connections+1] = UserInputService.InputChanged:Connect(function(i)
     if dragging and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
         local d = i.Position - dragStart
