@@ -147,14 +147,14 @@ local function copyLink(url, label, color)
         if setclipboard then setclipboard(url) end
     end)
     if ok then
-        notify(label .. " copiato negli appunti! Incollalo nel browser.", color)
+        notify(label .. " copied to clipboard! Paste it into your browser.", color)
     else
         notify(url, color)
     end
 end
 
-local function joinDiscord() copyLink(DISCORD_INVITE, "Link Discord", Theme.Discord) end
-local function subYouTube() copyLink(YOUTUBE_CHANNEL, "Canale YouTube", Theme.YouTube) end
+local function joinDiscord() copyLink(DISCORD_INVITE, "Discord link", Theme.Discord) end
+local function subYouTube() copyLink(YOUTUBE_CHANNEL, "YouTube channel", Theme.YouTube) end
 
 -----------------------------------------------------------
 -- Main window
@@ -168,13 +168,14 @@ Main.BackgroundColor3 = Theme.Bg
 Main.BorderSizePixel = 0
 Main.ClipsDescendants = true
 Main.Parent = ScreenGui
-corner(Main, 10)
+corner(Main, 6)
 stroke(Main, Theme.Accent, 1.5, 0.4)
+pad(Main, 2)
 
 -- Title bar
 local TitleBar = Instance.new("Frame")
 TitleBar.Size = UDim2.new(1, 0, 0, 38)
-TitleBar.BackgroundColor3 = Theme.Bg2
+TitleBar.BackgroundColor3 = Theme.Bg
 TitleBar.BorderSizePixel = 0
 TitleBar.Parent = Main
 
@@ -311,8 +312,8 @@ local function addTab(name, icon, order)
     corner(indicator, 2)
 
     local label = Instance.new("TextLabel")
-    label.Text = icon .. "  " .. name
-    label.Size = UDim2.new(1, -14, 1, 0)
+    label.Text = name
+    label.Size = UDim2.new(1, -24, 1, 0)
     label.Position = UDim2.new(0, 14, 0, 0)
     label.BackgroundTransparency = 1
     label.TextColor3 = Theme.SubText
@@ -939,7 +940,7 @@ CreateButton(playerPage, "Sub to YouTube", 6, subYouTube, Theme.YouTube)
 
 CreateSection(playerPage, "Danger Zone", 7)
 local toggleInfo = Instance.new("TextLabel")
-toggleInfo.Text = "Right Ctrl per nascondere/mostrare la UI"
+toggleInfo.Text = "Right Ctrl to toggle the UI"
 toggleInfo.Size = UDim2.new(1, 0, 0, 18)
 toggleInfo.BackgroundTransparency = 1
 toggleInfo.TextColor3 = Theme.SubText
@@ -950,7 +951,7 @@ toggleInfo.LayoutOrder = 8
 toggleInfo.Parent = playerPage
 
 CreateButton(playerPage, "Destroy Script", 9, function()
-    notify("Mirko Hub chiuso.", Theme.Danger)
+    notify("Mirko Hub closed.", Theme.Danger)
     task.wait(0.2)
     if Cleanup then Cleanup() end
 end, Theme.Danger)
@@ -982,11 +983,11 @@ end)
 local isOpen = true
 MinBtn.MouseButton1Click:Connect(function()
     isOpen = not isOpen
-    local goal = isOpen and UDim2.new(0, 480, 0, 340) or UDim2.new(0, 480, 0, 38)
+    local goal = isOpen and UDim2.new(0, 480, 0, 340) or UDim2.new(0, 480, 0, 42)
     TweenService:Create(Main, TweenInfo.new(0.28, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = goal}):Play()
 end)
 CloseBtn.MouseButton1Click:Connect(function()
-    notify("Mirko Hub chiuso.", Theme.Danger)
+    notify("Mirko Hub closed.", Theme.Danger)
     task.wait(0.2)
     if Cleanup then Cleanup() end
 end)
