@@ -10,6 +10,7 @@ local Camera = game:GetService("Workspace").CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
 local DISCORD_INVITE = "https://discord.com/invite/qfyfqMnBYK"
+local YOUTUBE_CHANNEL = "https://www.youtube.com/@MIRKOKING"
 
 -- Theme
 local Theme = {
@@ -23,6 +24,7 @@ local Theme = {
     Off       = Color3.fromRGB(45, 45, 45),
     Danger    = Color3.fromRGB(235, 60, 60),
     Discord   = Color3.fromRGB(88, 101, 242),
+    YouTube   = Color3.fromRGB(255, 0, 0),
 }
 
 -- Config
@@ -109,16 +111,19 @@ local function notify(text, color)
     end)
 end
 
-local function joinDiscord()
+local function copyLink(url, label, color)
     local ok = pcall(function()
-        if setclipboard then setclipboard(DISCORD_INVITE) end
+        if setclipboard then setclipboard(url) end
     end)
     if ok then
-        notify("Invito Discord copiato negli appunti! Incollalo nel browser.", Theme.Discord)
+        notify(label .. " copiato negli appunti! Incollalo nel browser.", color)
     else
-        notify("Unisciti: " .. DISCORD_INVITE, Theme.Discord)
+        notify(url, color)
     end
 end
+
+local function joinDiscord() copyLink(DISCORD_INVITE, "Link Discord", Theme.Discord) end
+local function subYouTube() copyLink(YOUTUBE_CHANNEL, "Canale YouTube", Theme.YouTube) end
 
 -----------------------------------------------------------
 -- Main window
@@ -173,6 +178,17 @@ Badge.TextSize = 11
 Badge.Parent = TitleBar
 corner(Badge, 5)
 
+local credit = Instance.new("TextLabel")
+credit.Text = "made by MIRKO KING YT"
+credit.Size = UDim2.new(0, 200, 1, 0)
+credit.Position = UDim2.new(0, 180, 0, 0)
+credit.BackgroundTransparency = 1
+credit.TextColor3 = Theme.SubText
+credit.TextXAlignment = Enum.TextXAlignment.Left
+credit.Font = Enum.Font.GothamMedium
+credit.TextSize = 11
+credit.Parent = TitleBar
+
 -- Close + minimize
 local CloseBtn = Instance.new("TextButton")
 CloseBtn.Text = "✕"
@@ -202,7 +218,7 @@ end
 -- Sidebar
 local Sidebar = Instance.new("Frame")
 Sidebar.Position = UDim2.new(0, 8, 0, 46)
-Sidebar.Size = UDim2.new(0, 124, 1, -98)
+Sidebar.Size = UDim2.new(0, 124, 1, -54)
 Sidebar.BackgroundColor3 = Theme.Bg2
 Sidebar.BorderSizePixel = 0
 Sidebar.Parent = Main
@@ -211,39 +227,6 @@ local sideList = Instance.new("UIListLayout", Sidebar)
 sideList.Padding = UDim.new(0, 4)
 sideList.SortOrder = Enum.SortOrder.LayoutOrder
 pad(Sidebar, 8)
-
--- Footer (Discord + credit)
-local Footer = Instance.new("Frame")
-Footer.Position = UDim2.new(0, 0, 1, -44)
-Footer.Size = UDim2.new(1, 0, 0, 44)
-Footer.BackgroundColor3 = Theme.Bg2
-Footer.BorderSizePixel = 0
-Footer.Parent = Main
-
-local DiscordBtn = Instance.new("TextButton")
-DiscordBtn.Text = "Join Discord"
-DiscordBtn.Size = UDim2.new(0, 150, 0, 30)
-DiscordBtn.Position = UDim2.new(0, 8, 0.5, -15)
-DiscordBtn.BackgroundColor3 = Theme.Discord
-DiscordBtn.TextColor3 = Color3.new(1, 1, 1)
-DiscordBtn.Font = Enum.Font.GothamBold
-DiscordBtn.TextSize = 13
-DiscordBtn.AutoButtonColor = true
-DiscordBtn.Parent = Footer
-corner(DiscordBtn, 7)
-DiscordBtn.MouseButton1Click:Connect(joinDiscord)
-
-local credit = Instance.new("TextLabel")
-credit.Text = "made by MIRKO KING YT"
-credit.AnchorPoint = Vector2.new(1, 0.5)
-credit.Position = UDim2.new(1, -12, 0.5, 0)
-credit.Size = UDim2.new(0, 200, 1, 0)
-credit.BackgroundTransparency = 1
-credit.TextColor3 = Theme.SubText
-credit.TextXAlignment = Enum.TextXAlignment.Right
-credit.Font = Enum.Font.GothamMedium
-credit.TextSize = 11
-credit.Parent = Footer
 
 -----------------------------------------------------------
 -- Tab system
@@ -254,7 +237,7 @@ local activeTab = nil
 local function makePage()
     local page = Instance.new("ScrollingFrame")
     page.Position = UDim2.new(0, 140, 0, 46)
-    page.Size = UDim2.new(1, -148, 1, -98)
+    page.Size = UDim2.new(1, -148, 1, -54)
     page.BackgroundTransparency = 1
     page.BorderSizePixel = 0
     page.ScrollBarThickness = 3
@@ -637,8 +620,9 @@ CreateInfo(playerPage, "User ID", tostring(LocalPlayer.UserId), 3)
 
 CreateSection(playerPage, "Community", 4)
 CreateButton(playerPage, "Join Discord", 5, joinDiscord, Theme.Discord)
+CreateButton(playerPage, "Sub to YouTube", 6, subYouTube, Theme.YouTube)
 
-CreateSection(playerPage, "Danger Zone", 6)
+CreateSection(playerPage, "Danger Zone", 7)
 local toggleInfo = Instance.new("TextLabel")
 toggleInfo.Text = "Right Ctrl per nascondere/mostrare la UI"
 toggleInfo.Size = UDim2.new(1, 0, 0, 18)
@@ -647,10 +631,10 @@ toggleInfo.TextColor3 = Theme.SubText
 toggleInfo.TextXAlignment = Enum.TextXAlignment.Left
 toggleInfo.Font = Enum.Font.Gotham
 toggleInfo.TextSize = 11
-toggleInfo.LayoutOrder = 7
+toggleInfo.LayoutOrder = 8
 toggleInfo.Parent = playerPage
 
-CreateButton(playerPage, "Destroy Script", 8, function()
+CreateButton(playerPage, "Destroy Script", 9, function()
     notify("Mirko Hub chiuso.", Theme.Danger)
     task.wait(0.2)
     if Cleanup then Cleanup() end
