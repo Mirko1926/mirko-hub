@@ -54,6 +54,10 @@ local Games = {
     [136801880565837] = {
         Name = "FPS Flick",
         File = "scripts/fpsflick.lua"
+    },
+    [292439477] = {
+        Name = "Phantom Forces",
+        File = "scripts/phantomforces.lua"
     }
 }
 
