@@ -1062,7 +1062,7 @@ local combatPage   = addTab("Combat",   "[A]", 1)
 local visualsPage  = addTab("Visuals",  "[V]", 2)
 local movePage     = addTab("Movement", "[M]", 3)
 local miscPage     = addTab("Misc",     "[*]", 4)
-local playerPage   = addTab("Player",   "[P]", 5)
+local playerPage   = addTab("Info",   "[P]", 5)
 
 -- COMBAT
 CreateSection(combatPage, "Aimbot", 1)

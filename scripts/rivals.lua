@@ -776,7 +776,7 @@ end
 -----------------------------------------------------------
 local combatPage  = addTab("Combat",  "[A]", 1)
 local visualsPage = addTab("Visuals", "[V]", 2)
-local playerPage  = addTab("Player",  "[P]", 3)
+local playerPage  = addTab("Info",  "[P]", 3)
 
 -- COMBAT
 CreateSection(combatPage, "Aimbot", 1)
