@@ -263,9 +263,15 @@ task.wait(0.5)
 -- Phase 5: Game detection
 local placeId = game.PlaceId
 local gameInfo = Games[placeId]
+local isUniversal = false
+if not gameInfo then
+    -- not in the list: fall back to the Universal script (basic ESP + Aimbot + Misc)
+    gameInfo = { Name = "Universal", File = "scripts/universal.lua" }
+    isUniversal = true
+end
 
 if gameInfo then
-    setStatus("Detected: " .. gameInfo.Name)
+    setStatus(isUniversal and "Game not in list - Universal mode" or ("Detected: " .. gameInfo.Name))
     setProgress(0.6)
     Status.TextColor3 = Color3.fromRGB(100, 255, 140)
     task.wait(0.5)
