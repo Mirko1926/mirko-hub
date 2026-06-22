@@ -28,6 +28,12 @@ local Config = {
     Tracers = false,
     MaxDistance = 3000,
     ESPColor = Color3.fromRGB(224, 176, 16),
+    -- aimbot (camera-lock on Roots; no team data on PF, targets everyone)
+    Aimbot = false,
+    AimbotFOV = 120,
+    AimbotSmooth = 8,
+    AimHeight = 2,
+    ShowFOV = false,
 }
 local toggleKey = Enum.KeyCode.RightControl
 
@@ -244,8 +250,21 @@ end
 -----------------------------------------------------------
 -- Build tabs
 -----------------------------------------------------------
-local visualsPage = addTab("Visuals", 1)
-local infoPage = addTab("Info", 2)
+local combatPage = addTab("Combat", 1)
+local visualsPage = addTab("Visuals", 2)
+local infoPage = addTab("Info", 3)
+
+CreateSection(combatPage, "Aimbot", 1)
+CreateToggle(combatPage, "Aimbot Enabled", Config.Aimbot, 2, function(v) Config.Aimbot = v end)
+CreateSlider(combatPage, "FOV Size", 40, 500, Config.AimbotFOV, 3, function(v) Config.AimbotFOV = v end)
+CreateSlider(combatPage, "Smoothing", 1, 25, Config.AimbotSmooth, 4, function(v) Config.AimbotSmooth = v end)
+CreateSlider(combatPage, "Aim Height", 0, 5, Config.AimHeight, 5, function(v) Config.AimHeight = v end)
+CreateToggle(combatPage, "Show FOV Circle", Config.ShowFOV, 6, function(v) Config.ShowFOV = v end)
+local aimNote = Instance.new("TextLabel")
+aimNote.Text = "Hold Right Click to aim. No team data on PF: targets everyone (incl. teammates)."
+aimNote.Size = UDim2.new(1, 0, 0, 40); aimNote.BackgroundColor3 = Theme.Bg2; aimNote.BorderSizePixel = 0; aimNote.LayoutOrder = 7
+aimNote.TextColor3 = Theme.SubText; aimNote.TextWrapped = true; aimNote.Font = Enum.Font.Gotham; aimNote.TextSize = 11; aimNote.Parent = combatPage
+corner(aimNote, 7); local anP = Instance.new("UIPadding", aimNote); anP.PaddingLeft = UDim.new(0,10); anP.PaddingRight = UDim.new(0,10)
 
 CreateSection(visualsPage, "ESP", 1)
 CreateToggle(visualsPage, "ESP Enabled", Config.ESP, 2, function(v) Config.ESP = v end)
@@ -261,7 +280,7 @@ CreateSpectrumPicker(colorBox, Config.ESPColor, function(c) Config.ESPColor = c 
 
 CreateSection(infoPage, "Note", 1)
 local note = Instance.new("TextLabel")
-note.Text = "PF hides names/team/health: ESP shows boxes + distance only. No aimbot (anti-cheat)."
+note.Text = "PF hides names/team/health: ESP shows boxes + distance only. Aimbot has no team data, so it targets everyone."
 note.Size = UDim2.new(1, 0, 0, 50); note.BackgroundColor3 = Theme.Bg2; note.BorderSizePixel = 0; note.LayoutOrder = 2; note.TextColor3 = Theme.SubText
 note.TextWrapped = true; note.Font = Enum.Font.Gotham; note.TextSize = 12; note.Parent = infoPage
 corner(note, 7); local notePad = Instance.new("UIPadding", note); notePad.PaddingLeft = UDim.new(0,10); notePad.PaddingRight = UDim.new(0,10)
@@ -274,7 +293,7 @@ CreateKeybind(infoPage, "Toggle UI Key", function() return toggleKey end, functi
 CreateSection(infoPage, "Danger Zone", 8)
 CreateButton(infoPage, "Destroy Script", 9, function() notify("Mirko Hub closed.", Theme.Danger); task.wait(0.2); if Cleanup then Cleanup() end end, Theme.Danger)
 
-selectTab("Visuals")
+selectTab("Combat")
 
 -----------------------------------------------------------
 -- Drag / minimize / close
@@ -351,6 +370,53 @@ Connections[#Connections+1] = RunService.RenderStepped:Connect(function()
 end)
 
 -----------------------------------------------------------
+-- Aimbot (camera-lock on nearest Root in FOV, hold Right Click)
+-----------------------------------------------------------
+local FOVCircle = Drawing.new("Circle")
+FOVCircle.Thickness = 1.5; FOVCircle.Filled = false; FOVCircle.Transparency = 0.6; FOVCircle.Visible = false
+
+local aimHold = false
+Connections[#Connections+1] = UserInputService.InputBegan:Connect(function(i, gpe)
+    if gpe then return end
+    if i.UserInputType == Enum.UserInputType.MouseButton2 then aimHold = true end
+end)
+Connections[#Connections+1] = UserInputService.InputEnded:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton2 then aimHold = false end
+end)
+
+Connections[#Connections+1] = RunService.RenderStepped:Connect(function()
+    local center = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    FOVCircle.Position = center
+    FOVCircle.Radius = Config.AimbotFOV
+    FOVCircle.Color = Config.ESPColor
+    FOVCircle.Visible = Config.ShowFOV and Config.Aimbot
+
+    if not (Config.Aimbot and aimHold) then return end
+    local roots = workspace:FindFirstChild("Roots")
+    if not roots then return end
+    local camPos = Camera.CFrame.Position
+    local best, bestDist = nil, Config.AimbotFOV
+    for _, part in ipairs(roots:GetChildren()) do
+        if part:IsA("BasePart") then
+            local d3 = (camPos - part.Position).Magnitude
+            if d3 >= 6 and d3 <= Config.MaxDistance then
+                local aimPos = part.Position + Vector3.new(0, Config.AimHeight, 0)
+                local sp, on = Camera:WorldToViewportPoint(aimPos)
+                if on then
+                    local d = (Vector2.new(sp.X, sp.Y) - center).Magnitude
+                    if d < bestDist then bestDist = d; best = aimPos end
+                end
+            end
+        end
+    end
+    if best then
+        local sp = Camera:WorldToViewportPoint(best)
+        local diff = (Vector2.new(sp.X, sp.Y) - center) / math.max(1, Config.AimbotSmooth)
+        pcall(function() mousemoverel(diff.X, diff.Y) end)
+    end
+end)
+
+-----------------------------------------------------------
 -- Toggle UI
 -----------------------------------------------------------
 Connections[#Connections+1] = UserInputService.InputBegan:Connect(function(i, gpe)
@@ -364,6 +430,7 @@ end)
 Cleanup = function()
     for _, c in pairs(Connections) do pcall(function() c:Disconnect() end) end
     for _, d in pairs(pool) do for _, o in pairs(d) do pcall(function() o:Remove() end) end end
+    pcall(function() FOVCircle:Remove() end)
     pcall(function() ScreenGui:Destroy() end)
 end
 getgenv().MirkoHubCleanup = Cleanup
