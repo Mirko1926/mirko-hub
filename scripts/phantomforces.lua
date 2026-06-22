@@ -1,6 +1,6 @@
 -- Mirko Hub Phantom Forces (ESP-only)
 -- PF usa un motore custom con nomi offuscati: ESP via workspace.Roots (box + distanza).
--- Niente aimbot, niente nomi/team/health (non leggibili in modo affidabile). by MIRKO KING YT
+-- No aimbot, no names/team/health (not reliably readable). by MIRKO KING YT
 -- Toggle UI: Right Ctrl
 
 local Players = game:GetService("Players")
@@ -261,7 +261,7 @@ CreateSpectrumPicker(colorBox, Config.ESPColor, function(c) Config.ESPColor = c 
 
 CreateSection(infoPage, "Note", 1)
 local note = Instance.new("TextLabel")
-note.Text = "PF nasconde nomi/team/health: ESP solo box + distanza. Niente aimbot (anti-cheat)."
+note.Text = "PF hides names/team/health: ESP shows boxes + distance only. No aimbot (anti-cheat)."
 note.Size = UDim2.new(1, 0, 0, 50); note.BackgroundColor3 = Theme.Bg2; note.BorderSizePixel = 0; note.LayoutOrder = 2; note.TextColor3 = Theme.SubText
 note.TextWrapped = true; note.Font = Enum.Font.Gotham; note.TextSize = 12; note.Parent = infoPage
 corner(note, 7); local notePad = Instance.new("UIPadding", note); notePad.PaddingLeft = UDim.new(0,10); notePad.PaddingRight = UDim.new(0,10)
